@@ -14,12 +14,14 @@ import (
 var homeTmpl *template.Template
 var receiptTmpl *template.Template
 
-const (
-	SMTPUser = "yourbot@gmail.com"
-	SMTPPass = "your-app-password"
-	SMTPHost = "smtp.gmail.com"
-	SMTPPort = "587"
-)
+
+	const (
+		SMTPUser = "dmitri@duskrose.co.za"
+		SMTPPass = "DuskRose2025!"
+		SMTPHost = "mail.duskrose.co.za"
+		SMTPPort = "587"
+	)
+
 
 func LoadTemplates() {
 	homeTmpl = template.Must(template.New("home").Parse(HomeHTML))
