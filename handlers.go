@@ -22,6 +22,27 @@ var receiptTmpl *template.Template
 		SMTPPort = "587"
 	)
 
+	func sendReceipt(invoice Invoice) error {
+		subject := fmt.Sprintf("Payment Receipt: R%.2f", invoice.Amount)
+		body := fmt.Sprintf(`
+	From: %s
+	To: %s
+	Subject: %s
+	
+	Hello %s,
+	
+	This is your payment receipt.
+	
+	Amount: R%.2f
+	Paid on: %s
+	
+	Thank you for your payment.
+	
+	InvoiceBot
+	`, invoice.Business, invoice.Email, subject, invoice.Client, invoice.Amount, invoice.DueDate)
+	
+		return SendEmail(invoice.Email, subject, body)
+	}
 
 func LoadTemplates() {
 	homeTmpl = template.Must(template.New("home").Parse(HomeHTML))
@@ -119,7 +140,6 @@ if dueDate == threeDaysBefore {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-
 func MarkPaidHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -130,10 +150,13 @@ func MarkPaidHandler(w http.ResponseWriter, r *http.Request) {
 	for i := range Invoices {
 		if Invoices[i].ID == id {
 			Invoices[i].Paid = true
+			SaveInvoices()
+
+			// Send receipt by email
+			go sendReceipt(Invoices[i])
 			break
 		}
 	}
-	SaveInvoices()
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
