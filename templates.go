@@ -4,13 +4,13 @@ var HomeHTML = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>InvoiceBot</title>
+  <title>Dusk Rose Invoice Reminder</title>
   <link rel="stylesheet" href="/style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <div class="container">
-    <h1>📄 InvoiceBot</h1>
+    <h1>📄 Dusk Rose Invoice Reminder</h1>
     <p class="tagline">Automated payment reminders for South African small businesses</p>
 
     <form method="post" action="/add" class="invoice-form">
@@ -113,7 +113,7 @@ var ReceiptHTML = `<!DOCTYPE html>
     <div class="amount">Amount: <strong>R{{printf "%.2f" .Amount}}</strong></div>
     <p><strong>Status:</strong> Paid on {{.DueDate}}</p>
     <p class="thank-you">Thank you for your payment!</p>
-    <p class="footer">InvoiceBot • Generated on {{.CreatedAt}}</p>
+    <p class="footer">Dusk Rose Invoice Reminder • Generated on {{.CreatedAt}}</p>
   </div>
 </body>
 </html>`

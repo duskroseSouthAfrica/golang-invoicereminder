@@ -38,7 +38,7 @@ func main() {
 		}
 	}()
 
-	fmt.Println("🚀 InvoiceBot running on http://localhost:8080")
+	fmt.Println("🚀 Dusk Rose Pty (Ltd) InvoiceBot running on http://localhost:8080")
 	fmt.Println("📄 Receipts available under 'Paid Invoices'")
 	http.ListenAndServe(":8080", nil)
 }
