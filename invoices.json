@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "business": "Dusk Rose Pty (Ltd)",
+    "client": "Client 1",
+    "email": "client1@client.com",
+    "amount": 500,
+    "dueDate": "2025-08-28",
+    "sent": false,
+    "paid": true,
+    "createdAt": "2025-08-27"
+  }
+]
