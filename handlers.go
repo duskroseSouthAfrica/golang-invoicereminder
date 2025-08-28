@@ -38,7 +38,7 @@ var receiptTmpl *template.Template
 	
 	Thank you for your payment.
 	
-	InvoiceBot
+	Dusrk Rose Pty (Ltd)
 	`, invoice.Business, invoice.Email, subject, invoice.Client, invoice.Amount, invoice.DueDate)
 	
 		return SendEmail(invoice.Email, subject, body)
