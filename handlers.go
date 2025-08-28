@@ -8,6 +8,7 @@ import (
 	"net/smtp"
 	"os"
 	"strconv"
+	"time"
 )
 
 var homeTmpl *template.Template
@@ -107,11 +108,12 @@ func AddInvoiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	SaveInvoices()
 
-	if dueDate == CurrentDate() {
-		subject := fmt.Sprintf("Payment Due: R%.2f from %s", amt, business)
-		body := fmt.Sprintf("Hi %s,\n\nYour payment of R%.2f is due today.\n\nThank you!", client, amt)
-		SendEmail(email, subject, body)
-	}
+	threeDaysBefore := time.Now().AddDate(0, 0, 3).Format("2006-01-02")
+if dueDate == threeDaysBefore {
+    subject := fmt.Sprintf("Upcoming Payment: R%.2f from %s", amt, business)
+    body := fmt.Sprintf("Hi %s,\n\nThis is a reminder that your payment of R%.2f is due in 3 days.\n\nThank you!", client, amt)
+    SendEmail(email, subject, body)
+}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
