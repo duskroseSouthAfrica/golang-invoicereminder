@@ -24,6 +24,8 @@ func main() {
 			time.Sleep(next.Sub(now))
 
 			today := CurrentDate()
+
+			// Send "due today" reminders
 			for i := range Invoices {
 				inv := &Invoices[i]
 				if inv.Paid || inv.Sent || inv.DueDate != today {
@@ -35,6 +37,9 @@ func main() {
 				inv.Sent = true
 				SaveInvoices()
 			}
+
+			// Send overdue reminders (uses the function)
+			sendOverdueReminders()
 		}
 	}()
 

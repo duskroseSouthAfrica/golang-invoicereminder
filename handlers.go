@@ -14,35 +14,64 @@ import (
 var homeTmpl *template.Template
 var receiptTmpl *template.Template
 
+const (
+	SMTPUser = "dmitri@duskrose.co.za"
+	SMTPPass = "DuskRose2025!"
+	SMTPHost = "mail.duskrose.co.za"
+	SMTPPort = "587"
+)
 
-	const (
-		SMTPUser = "dmitri@duskrose.co.za"
-		SMTPPass = "DuskRose2025!"
-		SMTPHost = "mail.duskrose.co.za"
-		SMTPPort = "587"
-	)
+func sendReceipt(invoice Invoice) error {
+	subject := fmt.Sprintf("Payment Receipt: R%.2f", invoice.Amount)
+	body := fmt.Sprintf(`From: %s
+To: %s
+Subject: %s
 
-	func sendReceipt(invoice Invoice) error {
-		subject := fmt.Sprintf("Payment Receipt: R%.2f", invoice.Amount)
-		body := fmt.Sprintf(`
-	From: %s
-	To: %s
-	Subject: %s
-	
-	Hello %s,
-	
-	This is your payment receipt.
-	
-	Amount: R%.2f
-	Paid on: %s
-	
-	Thank you for your payment.
-	
-	Dusrk Rose Pty (Ltd)
-	`, invoice.Business, invoice.Email, subject, invoice.Client, invoice.Amount, invoice.DueDate)
-	
-		return SendEmail(invoice.Email, subject, body)
+Hello %s,
+
+This is your payment receipt.
+
+Amount: R%.2f
+Paid on: %s
+
+Thank you for your payment.
+
+Dusk Rose Pty (Ltd)
+`, invoice.Business, invoice.Email, subject, invoice.Client, invoice.Amount, invoice.DueDate)
+
+	return SendEmail(invoice.Email, subject, body)
+}
+
+func sendOverdueReminders() {
+	today, _ := time.Parse("2006-01-02", CurrentDate())
+
+	for i := range Invoices {
+		inv := &Invoices[i]
+		if inv.Paid || !inv.Sent {
+			continue // Skip if paid or not yet sent (not overdue)
+		}
+
+		dueDate, err := time.Parse("2006-01-02", inv.DueDate)
+		if err != nil {
+			continue
+		}
+
+		// If due date was before today → overdue
+		if dueDate.Before(today) {
+			subject := fmt.Sprintf("Reminder: Payment Overdue – R%.2f", inv.Amount)
+			body := fmt.Sprintf(
+				"Hi %s,\n\nThis is a reminder that your payment of R%.2f is overdue.\n\nPlease settle as soon as possible.\n\nThank you!",
+				inv.Client, inv.Amount)
+
+			err := SendEmail(inv.Email, subject, body)
+			if err == nil {
+				fmt.Printf("✅ Sent overdue reminder to %s\n", inv.Email)
+			} else {
+				fmt.Printf("❌ Failed to send overdue reminder to %s: %v\n", inv.Email, err)
+			}
+		}
 	}
+}
 
 func LoadTemplates() {
 	homeTmpl = template.Must(template.New("home").Parse(HomeHTML))
@@ -132,14 +161,15 @@ func AddInvoiceHandler(w http.ResponseWriter, r *http.Request) {
 	SaveInvoices()
 
 	threeDaysBefore := time.Now().AddDate(0, 0, 3).Format("2006-01-02")
-if dueDate == threeDaysBefore {
-    subject := fmt.Sprintf("Upcoming Payment: R%.2f from %s", amt, business)
-    body := fmt.Sprintf("Hi %s,\n\nThis is a reminder that your payment of R%.2f is due in 3 days.\n\nThank you!", client, amt)
-    SendEmail(email, subject, body)
-}
+	if dueDate == threeDaysBefore {
+		subject := fmt.Sprintf("Upcoming Payment: R%.2f from %s", amt, business)
+		body := fmt.Sprintf("Hi %s,\n\nThis is a reminder that your payment of R%.2f is due in 3 days.\n\nThank you!", client, amt)
+		SendEmail(email, subject, body)
+	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
 func MarkPaidHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -151,8 +181,6 @@ func MarkPaidHandler(w http.ResponseWriter, r *http.Request) {
 		if Invoices[i].ID == id {
 			Invoices[i].Paid = true
 			SaveInvoices()
-
-			// Send receipt by email
 			go sendReceipt(Invoices[i])
 			break
 		}
