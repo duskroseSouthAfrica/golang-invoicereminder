@@ -121,6 +121,23 @@ func SendEmail(to, subject, body string) error {
 	)
 }
 
+func DeleteInvoiceHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	id, _ := strconv.Atoi(r.FormValue("id"))
+	for i := range Invoices {
+		if Invoices[i].ID == id {
+			Invoices = append(Invoices[:i], Invoices[i+1:]...)
+			SaveInvoices()
+			break
+		}
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.Error(w, "Not Found", http.StatusNotFound)

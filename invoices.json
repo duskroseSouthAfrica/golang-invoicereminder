@@ -1,16 +1,5 @@
 [
   {
-    "id": 1,
-    "business": "Dusk Rose",
-    "client": "Rustic Solutions",
-    "email": "dmitri@duskrose.co.za",
-    "amount": 444,
-    "dueDate": "2025-08-28",
-    "sent": false,
-    "paid": true,
-    "createdAt": "2025-08-29"
-  },
-  {
     "id": 2,
     "business": "Dusk Rose",
     "client": "Client 1",

@@ -15,6 +15,7 @@ func main() {
 	http.HandleFunc("/mark-paid", MarkPaidHandler)
 	http.HandleFunc("/receipt", ReceiptHandler)
 	http.HandleFunc("/style.css", StyleCSS)
+	http.HandleFunc("/delete", DeleteInvoiceHandler)
 
 	go func() {
 		for {

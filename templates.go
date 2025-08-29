@@ -79,6 +79,7 @@ var HomeHTML = `<!DOCTYPE html>
         <th>Amount</th>
         <th>Paid On</th>
         <th>Receipt</th>
+        <th>Action</th>
       </tr>
       {{range .Invoices}}
       {{if .Paid}}
@@ -89,6 +90,12 @@ var HomeHTML = `<!DOCTYPE html>
         <td>R{{printf "%.2f" .Amount}}</td>
         <td>{{.DueDate}}</td>
         <td><a href="/receipt?id={{.ID}}" target="_blank">📄 View</a></td>
+        <td>
+          <form method="post" action="/delete" style="display:inline">
+            <input type="hidden" name="id" value="{{.ID}}">
+            <button type="submit" onclick="return confirm('Delete this invoice?')">Delete</button>
+          </form>
+        </td>
       </tr>
       {{end}}
       {{end}}
